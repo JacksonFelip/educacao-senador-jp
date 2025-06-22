@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Educação - Senador José Porfírio</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --cor-primaria: #1e3a8a;
+            --cor-secundaria: #0d9488;
+            --cor-destaque: #f59e0b;
+            --cor-fundo: #f0f9ff;
+            --cor-texto: #1e293b;
+            --cor-borda: #cbd5e1;
+            --cor-card: #ffffff;
+            --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--sombra);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        #filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1.5rem;
+            background-color: var(--cor-card);
+            margin: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--sombra);
+            align-items: center;
+        }
+
+        .filtro {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .filtro label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .filtro select {
+            padding: 0.5rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        #btnAplicar {
+            padding: 0.5rem 1rem;
+            background-color: var(--cor-primaria);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+
+        #btnAplicar:hover {
+            background-color: #152c6e;
+        }
+
+        #cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--cor-card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: var(--cor-primaria);
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card span {
+            font-weight: 600;
+        }
+
+        .positivo {
+            color: #16a34a;
+        }
+
+        .negativo {
+            color: #dc2626;
+        }
+
+        .grafico-container {
+            background-color: var(--cor-card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem;
+            box-shadow: var(--sombra);
+        }
+
+        .grafico-container h2 {
+            margin-bottom: 1rem;
+            color: var(--cor-primaria);
+            font-size: 1.5rem;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        #tabelaRecursosMensais {
+            background-color: var(--cor-card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem;
+            box-shadow: var(--sombra);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--cor-borda);
+        }
+
+        th {
+            background-color: var(--cor-primaria);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+
+        #insights {
+            background-color: var(--cor-card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem;
+            box-shadow: var(--sombra);
+        }
+
+        #insights h2 {
+            color: var(--cor-primaria);
+            margin-bottom: 1rem;
+        }
+
+        #insights ul {
+            padding-left: 1.5rem;
+        }
+
+        #insights li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--cor-secundaria);
+            min-width: 40px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        .export-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--cor-secundaria);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .export-btn:hover {
+            background-color: #0c7d73;
+        }
+
+        .tab-container {
+            margin: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--cor-borda);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background-color: #e2e8f0;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            margin-right: 0.25rem;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: var(--cor-card);
+            border-bottom: 3px solid var(--cor-primaria);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .populacao-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .populacao-item {
+            padding: 0.5rem;
+            background-color: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        .populacao-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--cor-primaria);
+        }
+
+        @media (max-width: 768px) {
+            #filtros {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #btnAplicar {
+                align-self: stretch;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-graduation-cap"></i> Dashboard Educação</h1>
+        <h2>Senador José Porfírio - PA</h2>
+    </header>
+
+    <div class="tab-container">
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">Dashboard</div>
+            <div class="tab" data-tab="dados">Dados Completos</div>
+            <div class="tab" data-tab="insights">Análise e Insights</div>
+        </div>
+
+        <div class="tab-content active" id="dashboard-content">
+            <section id="filtros">
+                <div class="filtro">
+                    <label for="anoRecursos"><i class="fas fa-calendar-alt"></i> Ano:</label>
+                    <select id="anoRecursos">
+                        <option value="todos">Todos</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+                <div class="filtro">
+                    <label for="programa"><i class="fas fa-list"></i> Programa:</label>
+                    <select id="programa">
+                        <option value="todos">Todos</option>
+                        <option value="QUOTA EST/MUN.">QUOTA EST/MUN.</option>
+                        <option value="EI NOVAS TURMAS">EI NOVAS TURMAS</option>
+                        <option value="E.T.I. FOMENTO DE MATRICULA">E.T.I. FOMENTO DE MATRICULA</option>
+                        <option value="PNAE">PNAE</option>
+                        <option value="FUNDEB">FUNDEB</option>
+                        <option value="PDDE">PDDE</option>
+                        <option value="PEAE">PEAE</option>
+                        <option value="PETE">PETE</option>
+                        <option value="PNATE">PNATE</option>
+                    </select>
+                </div>
+                <button id="btnAplicar"><i class="fas fa-filter"></i> Aplicar Filtros</button>
+            </section>
+
+            <section id="cards">
+                <div class="card">
+                    <h3><i class="fas fa-money-bill-wave"></i> Recursos Totais</h3>
+                    <p id="totalRecursos">R$ 78.853.679,95</p>
+                    <p>Variação: <span class="positivo" id="variacaoRecursos">+7.58%</span></p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-user-graduate"></i> Matrículas</h3>
+                    <p id="totalMatriculas">5.900</p>
+                    <p>Variação: <span class="negativo" id="variacaoMatriculas">-4.64%</span></p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-users"></i> População</h3>
+                    <div class="populacao-grid">
+                        <div class="populacao-item">
+                            <h4>Geral</h4>
+                            <p id="populacaoGeral">22.576</p>
+                        </div>
+                        <div class="populacao-item">
+                            <h4>0-14 anos</h4>
+                            <p id="populacao0a14">6.757</p>
+                        </div>
+                        <div class="populacao-item">
+                            <h4>Nascidos Vivos</h4>
+                            <p id="nascidosVivos">303</p>
+                        </div>
+                        <div class="populacao-item">
+                            <h4>Óbitos < 1 ano</h4>
+                            <p id="obitosMenor1Ano">13</p>
+                        </div>
+                        <div class="populacao-item">
+                            <h4>Taxa Atendimento</h4>
+                            <p id="taxaAtendimento">87.32%</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="grafico-container">
+                    <h2><i class="fas fa-chart-line"></i> Evolução dos Recursos Anuais</h2>
+                    <div class="chart-container">
+                        <canvas id="graficoRecursos"></canvas>
+                    </div>
+                </section>
+
+                <section class="grafico-container">
+                    <h2><i class="fas fa-chart-bar"></i> Evolução das Matrículas</h2>
+                    <div class="chart-container">
+                        <canvas id="graficoMatriculas"></canvas>
+                    </div>
+                </section>
+
+                <section class="grafico-container">
+                    <h2><i class="fas fa-chart-pie"></i> Distribuição das Matrículas por Modo de Ensino</h2>
+                    <div class="chart-container">
+                        <canvas id="graficoMatriculasModo"></canvas>
+                    </div>
+                </section>
+
+                <section class="grafico-container">
+                    <h2><i class="fas fa-calendar-day"></i> Recursos Mensais</h2>
+                    <div class="chart-container">
+                        <canvas id="graficoRecursosMensais"></canvas>
+                    </div>
+                    <p class="text-center">Filtrado para: <span id="mesAtual">Todos os meses</span></p>
+                </section>
+            </div>
+
+            <section id="tabelaRecursosMensais" class="grafico-container grid-full">
+                <h2><i class="fas fa-table"></i> Detalhamento dos Recursos Mensais</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Programa</th>
+                            <th>Mês</th>
+                            <th>Valor (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                        <!-- Preenchido por JS -->
+                    </tbody>
+                </table>
+                <div class="export-buttons">
+                    <button class="export-btn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                    <button class="export-btn"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="tab-content" id="dados-content">
+            <section class="grafico-container">
+                <h2><i class="fas fa-database"></i> Dados de Recursos Anuais</h2>
+                <div class="chart-container">
+                    <canvas id="graficoRecursosDetalhado"></canvas>
+                </div>
+            </section>
+
+            <section class="grafico-container">
+                <h2><i class="fas fa-table"></i> Tabela de Recursos por Programa</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Programa</th>
+                            <th>2021</th>
+                            <th>2022</th>
+                            <th>2023</th>
+                            <th>2024</th>
+                            <th>2025</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaRecursosAnuais">
+                        <!-- Preenchido por JS -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <div class="tab-content" id="insights-content">
+            <section id="insights">
+                <h2><i class="fas fa-lightbulb"></i> Insights e Observações</h2>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <h3>Dominância do FUNDEB</h3>
+                        <p>O programa FUNDEB representa mais de <strong>94%</strong> dos recursos totais em 2025, demonstrando uma forte dependência deste programa para o financiamento da educação municipal.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div>
+                        <h3>Redução de Programas</h3>
+                        <p>Em 2025, vários programas como PNAE, PDDE e PNATE tiveram seus recursos zerados, o que pode impactar significativamente áreas específicas da educação municipal.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                        <h3>Queda de Matrículas</h3>
+                        <p>Houve uma queda acumulada de <strong>7.17%</strong> no número de matrículas desde 2021, com a maior redução ocorrendo em 2025 (-4.64%). Esta tendência merece investigação aprofundada.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-school"></i></div>
+                    <div>
+                        <h3>Foco no Ensino Fundamental</h3>
+                        <p>Em 2025, o Ensino Fundamental corresponde a <strong>78.41%</strong> das matrículas, enquanto a educação infantil (creches) representa apenas 2.81%, indicando possíveis oportunidades de expansão.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div>
+                        <h3>Taxa de Atendimento</h3>
+                        <p>A taxa de atendimento escolar para a população de 0 a 14 anos é de <strong>87.32%</strong>, sugerindo que ainda há espaço para aumentar a cobertura educacional.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-money-check-alt"></i></div>
+                    <div>
+                        <h3>Recursos Mensais</h3>
+                        <p>A Quota Estadual e Municipal representa o maior volume de recursos mensais, com valores significativos distribuídos ao longo dos primeiros meses de 2025.</p>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div>
+                        <h3>Variação de Recursos</h3>
+                        <p>Entre 2023 e 2024, houve um aumento expressivo de <strong>47.64%</strong> nos recursos totais, principalmente impulsionado pelo FUNDEB e QUOTA EST/MUN.</p>
+                    </div>
+                </div>
+                
+                <h3>Recomendações Estratégicas:</h3>
+                <ul>
+                    <li>Diversificar as fontes de financiamento para reduzir a dependência do FUNDEB</li>
+                    <li>Investigar as causas da redução de matrículas e desenvolver estratégias para reversão</li>
+                    <li>Ampliar a oferta de educação infantil, especialmente em creches</li>
+                    <li>Realizar estudo detalhado sobre a alocação de recursos dos programas zerados em 2025</li>
+                    <li>Desenvolver estratégias para aumentar a taxa de atendimento para 95% até 2026</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>Desenvolvido para a Prefeitura de Senador José Porfírio - PA</p>
+        <p>Dados atualizados em Junho de 2025 | Dashboard Interativo de Educação</p>
+    </footer>
+
+    <script>
+        // Dados simulados baseados na planilha fornecida
+        const dados = {
+            recursos_anuais: {
+                anos: [2021, 2022, 2023, 2024, 2025],
+                programas: [
+                    {
+                        nome: "QUOTA EST/MUN.",
+                        valores: [500197.39, 563529.87, 630112.6, 3138681.33, 3388387.84],
+                        variacoes: [null, "+12.65%", "+11.82%", "+398.19%", "+7.96%"]
+                    },
+                    {
+                        nome: "EI NOVAS TURMAS",
+                        valores: [0, 0, 0, 305170.91, 0],
+                        variacoes: [null, null, null, null, "-100%"]
+                    },
+                    {
+                        nome: "E.T.I. FOMENTO DE MATRICULA",
+                        valores: [0, 0, 670516.1, 670516.12, 0],
+                        variacoes: [null, null, null, "+0.00%", "-100%"]
+                    },
+                    {
+                        nome: "PNAE",
+                        valores: [628537.8, 538108, 772226, 1279150, 0],
+                        variacoes: [null, "-14.39%", "+43.52%", "+65.65%", "-100%"]
+                    },
+                    {
+                        nome: "FUNDEB",
+                        valores: [43033721.09, 43899890.98, 46493767.41, 66782407.36, 74835214.61],
+                        variacoes: [null, "+2.01%", "+5.91%", "+43.62%", "+12.07%"]
+                    },
+                    {
+                        nome: "PDDE",
+                        valores: [184110, 203080, 172190, 191900, 0],
+                        variacoes: [null, "+10.31%", "-15.21%", "+11.44%", "-100%"]
+                    },
+                    {
+                        nome: "PEAE",
+                        valores: [0, 43056, 204600, 0, 201600],
+                        variacoes: [null, null, "+375.22%", "-100%", null]
+                    },
+                    {
+                        nome: "PETE",
+                        valores: [0, 101070.97, 386078.77, 423744.86, 476477.5],
+                        variacoes: [null, null, "+282.00%", "+9.76%", "+12.44%"]
+                    },
+                    {
+                        nome: "PNATE",
+                        valores: [669064.32, 652648.48, 685026.5, 475405.64, 0],
+                        variacoes: [null, "-2.45%", "+4.96%", "-30.61%", "-100%"]
+                    }
+                ],
+                totais: [44988630.60, 45980384.30, 49647517.38, 73298976.22, 78853679.95],
+                variacoes_totais: [null, "+2.20%", "+7.98%", "+47.64%", "+7.58%"]
+            },
+            matriculas: {
+                evolucao: {
+                    anos: [2021, 2022, 2023, 2024, 2025],
+                    quantidades: [6356, 6227, 6210, 6187, 5900],
+                    variacoes: [null, "-2.03%", "-0.27%", "-0.37%", "-4.64%"]
+                },
+                modo_ensino_2025: [
+                    {modo: "Creche em tempo parcial pública", quantidade: 166, porcentagem: 2.81},
+                    {modo: "Pré-Escola em tempo integral pública", quantidade: 1, porcentagem: 0.02},
+                    {modo: "Pré-Escola em tempo parcial pública", quantidade: 792, porcentagem: 13.42},
+                    {modo: "Ensino Fundamental em tempo integral", quantidade: 3269, porcentagem: 55.41},
+                    {modo: "Ensino Fundamental em tempo parcial - anos iniciais", quantidade: 835, porcentagem: 14.15},
+                    {modo: "Ensino Fundamental em tempo parcial - anos finais", quantidade: 522, porcentagem: 8.85},
+                    {modo: "Educação de Jovens e Adultos", quantidade: 255, porcentagem: 4.32},
+                    {modo: "Educação Especial", quantidade: 61, porcentagem: 1.03},
+                    {modo: "Atendimento Educacional Especializado", quantidade: 29, porcentagem: 0.49}
+                ]
+            },
+            populacao: {
+                geral: 22576,
+                "0_a_14_anos": 6757,
+                nascidos_vivos: 303,
+                obitos_menor_1_ano: 13,
+                alunos_atendidos_2025: 5900,
+                taxa_atendimento: 87.32
+            },
+            recursos_mensais: {
+                PNAE: {
+                    "fev/25": 168052.50,
+                    "mar/25": 168052.50
+                },
+                PNATE: {
+                    "jan/25": 28498.86,
+                    "mar/25": 310248.45
+                },
+                QUOTA: {
+                    "jan/25": 473359.57,
+                    "fev/25": 267419.41,
+                    "mar/25": 266908.01
+                }
+            }
+        };
+
+        // Função para formatar números como moeda
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        // Função para formatar números
+        function formatarNumero(valor) {
+            return new Intl.NumberFormat('pt-BR').format(valor);
+        }
+
+        // Variáveis para armazenar as instâncias dos gráficos
+        let graficoRecursosInstance = null;
+        let graficoMatriculasInstance = null;
+        let graficoMatriculasModoInstance = null;
+        let graficoRecursosMensaisInstance = null;
+        let graficoRecursosDetalhadoInstance = null;
+
+        // Função para criar o gráfico de recursos anuais
+        function criarGraficoRecursos(anoSelecionado, programaSelecionado) {
+            const ctx = document.getElementById('graficoRecursos').getContext('2d');
+            
+            if (graficoRecursosInstance) {
+                graficoRecursosInstance.destroy();
+            }
+            
+            let anos = dados.recursos_anuais.anos;
+            let dadosGrafico = [];
+            let label = 'Recursos Totais (R$)';
+            
+            if (programaSelecionado === 'todos') {
+                // Se estiver mostrando todos os programas, exibe o total anual
+                if (anoSelecionado === 'todos') {
+                    dadosGrafico = dados.recursos_anuais.totais;
+                } else {
+                    // Filtra apenas o ano selecionado para o total
+                    const indexAno = anos.indexOf(parseInt(anoSelecionado));
+                    anos = [anos[indexAno]];
+                    dadosGrafico = [dados.recursos_anuais.totais[indexAno]];
+                }
+            } else {
+                // Filtra o programa específico
+                const programa = dados.recursos_anuais.programas.find(p => p.nome === programaSelecionado);
+                label = programa.nome;
+                
+                if (anoSelecionado === 'todos') {
+                    dadosGrafico = programa.valores;
+                } else {
+                    const indexAno = anos.indexOf(parseInt(anoSelecionado));
+                    anos = [anos[indexAno]];
+                    dadosGrafico = [programa.valores[indexAno]];
+                }
+            }
+            
+            graficoRecursosInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: anos,
+                    datasets: [{
+                        label: label,
+                        data: dadosGrafico,
+                        backgroundColor: '#0d9488',
+                        borderColor: '#0d9488',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatarMoeda(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatarMoeda(context.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para criar o gráfico de matrículas
+        function criarGraficoMatriculas(anoSelecionado) {
+            const ctx = document.getElementById('graficoMatriculas').getContext('2d');
+            const anos = dados.matriculas.evolucao.anos;
+            const quantidades = dados.matriculas.evolucao.quantidades;
+            const variacoes = dados.matriculas.evolucao.variacoes;
+
+            if (graficoMatriculasInstance) {
+                graficoMatriculasInstance.destroy();
+            }
+            
+            let labels = anos;
+            let valores = quantidades;
+            
+            if (anoSelecionado !== 'todos') {
+                const indexAno = anos.indexOf(parseInt(anoSelecionado));
+                labels = [anos[indexAno]];
+                valores = [quantidades[indexAno]];
+            }
+            
+            graficoMatriculasInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantidade de Matrículas',
+                        data: valores,
+                        backgroundColor: 'rgba(29, 78, 216, 0.2)',
+                        borderColor: '#1d4ed8',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    if (anoSelecionado === 'todos' && index > 0) {
+                                        return `Variação: ${variacoes[index]}`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para criar o gráfico de distribuição de matrículas
+        function criarGraficoMatriculasModo() {
+            const ctx = document.getElementById('graficoMatriculasModo').getContext('2d');
+            const modos = dados.matriculas.modo_ensino_2025.map(item => item.modo);
+            const quantidades = dados.matriculas.modo_ensino_2025.map(item => item.quantidade);
+
+            if (graficoMatriculasModoInstance) {
+                graficoMatriculasModoInstance.destroy();
+            }
+            
+            graficoMatriculasModoInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: modos,
+                    datasets: [{
+                        data: quantidades,
+                        backgroundColor: [
+                            '#1e3a8a', '#0d9488', '#3b82f6', '#60a5fa', '#93c5fd',
+                            '#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const porcentagem = (context.raw / 5900 * 100).toFixed(2);
+                                    return `${context.label}: ${context.raw} (${porcentagem}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para criar o gráfico de recursos mensais
+        function criarGraficoRecursosMensais(mesSelecionado = null) {
+            const ctx = document.getElementById('graficoRecursosMensais').getContext('2d');
+            
+            if (graficoRecursosMensaisInstance) {
+                graficoRecursosMensaisInstance.destroy();
+            }
+            
+            // Determinar quais meses mostrar
+            let meses;
+            let dadosPNAE = [];
+            let dadosPNATE = [];
+            let dadosQUOTA = [];
+            
+            if (mesSelecionado) {
+                meses = [mesSelecionado];
+                dadosPNAE = [dados.recursos_mensais.PNAE[mesSelecionado] || 0];
+                dadosPNATE = [dados.recursos_mensais.PNATE[mesSelecionado] || 0];
+                dadosQUOTA = [dados.recursos_mensais.QUOTA[mesSelecionado] || 0];
+                document.getElementById('mesAtual').textContent = mesSelecionado;
+            } else {
+                // Juntar todos os meses disponíveis
+                meses = [
+                    ...Object.keys(dados.recursos_mensais.PNAE),
+                    ...Object.keys(dados.recursos_mensais.PNATE),
+                    ...Object.keys(dados.recursos_mensais.QUOTA)
+                ];
+                // Remover duplicatas e ordenar
+                meses = [...new Set(meses)].sort((a, b) => {
+                    const mesesOrdem = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                    const mesA = a.split('/')[0];
+                    const mesB = b.split('/')[0];
+                    return mesesOrdem.indexOf(mesA) - mesesOrdem.indexOf(mesB);
+                });
+                
+                // Preencher os dados para cada mês
+                dadosPNAE = meses.map(mes => dados.recursos_mensais.PNAE[mes] || 0);
+                dadosPNATE = meses.map(mes => dados.recursos_mensais.PNATE[mes] || 0);
+                dadosQUOTA = meses.map(mes => dados.recursos_mensais.QUOTA[mes] || 0);
+                document.getElementById('mesAtual').textContent = 'Todos os meses';
+            }
+            
+            graficoRecursosMensaisInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'PNAE',
+                            data: dadosPNAE,
+                            backgroundColor: '#1e3a8a'
+                        },
+                        {
+                            label: 'PNATE',
+                            data: dadosPNATE,
+                            backgroundColor: '#0d9488'
+                        },
+                        {
+                            label: 'QUOTA',
+                            data: dadosQUOTA,
+                            backgroundColor: '#3b82f6'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatarMoeda(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatarMoeda(context.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para preencher a tabela de recursos mensais
+        function preencherTabelaRecursosMensais(mesSelecionado = null) {
+            const corpoTabela = document.getElementById('corpoTabela');
+            corpoTabela.innerHTML = '';
+
+            // Função para adicionar linha
+            const adicionarLinha = (programa, mes, valor) => {
+                if (valor && (!mesSelecionado || mes === mesSelecionado)) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${programa}</td>
+                        <td>${mes}</td>
+                        <td>${formatarMoeda(valor)}</td>
+                    `;
+                    corpoTabela.appendChild(tr);
+                }
+            };
+
+            // Adicionar dados do PNAE
+            Object.entries(dados.recursos_mensais.PNAE).forEach(([mes, valor]) => {
+                adicionarLinha('PNAE', mes, valor);
+            });
+
+            // Adicionar dados do PNATE
+            Object.entries(dados.recursos_mensais.PNATE).forEach(([mes, valor]) => {
+                adicionarLinha('PNATE', mes, valor);
+            });
+
+            // Adicionar dados da QUOTA
+            Object.entries(dados.recursos_mensais.QUOTA).forEach(([mes, valor]) => {
+                adicionarLinha('QUOTA', mes, valor);
+            });
+        }
+
+        // Função para criar o gráfico de recursos detalhado
+        function criarGraficoRecursosDetalhado() {
+            const ctx = document.getElementById('graficoRecursosDetalhado').getContext('2d');
+            const anos = dados.recursos_anuais.anos;
+            const programas = dados.recursos_anuais.programas;
+
+            if (graficoRecursosDetalhadoInstance) {
+                graficoRecursosDetalhadoInstance.destroy();
+            }
+
+            const datasets = programas.map((programa, index) => {
+                const colors = [
+                    '#1e3a8a', '#0d9488', '#3b82f6', '#60a5fa', '#93c5fd',
+                    '#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1'
+                ];
+                
+                return {
+                    label: programa.nome,
+                    data: programa.valores,
+                    backgroundColor: colors[index],
+                    stack: 'Stack 0'
+                };
+            });
+
+            graficoRecursosDetalhadoInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: anos,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatarMoeda(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatarMoeda(context.raw)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para preencher a tabela de recursos anuais
+        function preencherTabelaRecursosAnuais(anoSelecionado = null) {
+            const corpoTabela = document.getElementById('tabelaRecursosAnuais');
+            corpoTabela.innerHTML = '';
+
+            const anos = dados.recursos_anuais.anos;
+            const colunas = anoSelecionado === 'todos' ? anos : [parseInt(anoSelecionado)];
+
+            // Cabeçalho da tabela
+            const trHeader = document.createElement('tr');
+            trHeader.innerHTML = `
+                <th>Programa</th>
+                ${colunas.map(ano => `<th>${ano}</th>`).join('')}
+            `;
+            corpoTabela.appendChild(trHeader);
+
+            // Dados dos programas
+            dados.recursos_anuais.programas.forEach(programa => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${programa.nome}</td>
+                    ${colunas.map(ano => {
+                        const index = anos.indexOf(ano);
+                        return `<td>${formatarMoeda(programa.valores[index])}</td>`;
+                    }).join('')}
+                `;
+                corpoTabela.appendChild(tr);
+            });
+
+            // Linha de totais
+            const trTotal = document.createElement('tr');
+            trTotal.style.fontWeight = 'bold';
+            trTotal.style.backgroundColor = '#f1f5f9';
+            trTotal.innerHTML = `
+                <td>TOTAL</td>
+                ${colunas.map(ano => {
+                    const index = anos.indexOf(ano);
+                    return `<td>${formatarMoeda(dados.recursos_anuais.totais[index])}</td>`;
+                }).join('')}
+            `;
+            corpoTabela.appendChild(trTotal);
+        }
+
+        // Função para atualizar o card de recursos totais
+        function atualizarCardRecursos(anoSelecionado) {
+            let indexAno;
+            if (anoSelecionado === 'todos') {
+                // Se for "todos", mostra o último ano (2025)
+                indexAno = 4;
+            } else {
+                indexAno = dados.recursos_anuais.anos.indexOf(parseInt(anoSelecionado));
+            }
+            
+            const totalAno = dados.recursos_anuais.totais[indexAno];
+            const variacao = dados.recursos_anuais.variacoes_totais[indexAno] || '0%';
+            
+            document.getElementById('totalRecursos').textContent = formatarMoeda(totalAno);
+            document.getElementById('variacaoRecursos').textContent = variacao;
+            document.getElementById('variacaoRecursos').className = variacao.includes('+') ? 'positivo' : 'negativo';
+        }
+
+        // Função para atualizar o card de matrículas
+        function atualizarCardMatriculas(anoSelecionado) {
+            let indexAno;
+            if (anoSelecionado === 'todos') {
+                // Se for "todos", mostra o último ano (2025)
+                indexAno = 4;
+            } else {
+                indexAno = dados.matriculas.evolucao.anos.indexOf(parseInt(anoSelecionado));
+            }
+            
+            const totalMatriculas = dados.matriculas.evolucao.quantidades[indexAno];
+            const variacao = dados.matriculas.evolucao.variacoes[indexAno] || '0%';
+            
+            document.getElementById('totalMatriculas').textContent = formatarNumero(totalMatriculas);
+            document.getElementById('variacaoMatriculas').textContent = variacao;
+            document.getElementById('variacaoMatriculas').className = variacao.includes('+') ? 'positivo' : 'negativo';
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Preencher os cards
+            document.getElementById('totalRecursos').textContent = formatarMoeda(dados.recursos_anuais.totais[4]);
+            document.getElementById('variacaoRecursos').textContent = dados.recursos_anuais.variacoes_totais[4];
+            
+            // Preencher card de matrículas
+            document.getElementById('totalMatriculas').textContent = formatarNumero(dados.matriculas.evolucao.quantidades[4]);
+            document.getElementById('variacaoMatriculas').textContent = dados.matriculas.evolucao.variacoes[4];
+            
+            // Preencher card de população
+            document.getElementById('populacaoGeral').textContent = formatarNumero(dados.populacao.geral);
+            document.getElementById('populacao0a14').textContent = formatarNumero(dados.populacao["0_a_14_anos"]);
+            document.getElementById('nascidosVivos').textContent = formatarNumero(dados.populacao.nascidos_vivos);
+            document.getElementById('obitosMenor1Ano').textContent = formatarNumero(dados.populacao.obitos_menor_1_ano);
+            document.getElementById('taxaAtendimento').textContent = dados.populacao.taxa_atendimento.toFixed(2) + '%';
+
+            // Inicializar gráficos
+            criarGraficoRecursos('2025', 'todos');
+            criarGraficoMatriculas('2025');
+            criarGraficoMatriculasModo();
+            criarGraficoRecursosMensais();
+            preencherTabelaRecursosMensais();
+            criarGraficoRecursosDetalhado();
+            preencherTabelaRecursosAnuais('2025');
+
+            // Configurar tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                });
+            });
+
+            // Configurar botão de aplicar filtros
+            document.getElementById('btnAplicar').addEventListener('click', () => {
+                const anoSelecionado = document.getElementById('anoRecursos').value;
+                const programaSelecionado = document.getElementById('programa').value;
+                
+                atualizarCardRecursos(anoSelecionado);
+                atualizarCardMatriculas(anoSelecionado);
+                criarGraficoRecursos(anoSelecionado, programaSelecionado);
+                criarGraficoMatriculas(anoSelecionado);
+                preencherTabelaRecursosAnuais(anoSelecionado);
+            });
+
+            // Configurar botões de exportação
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tipo = btn.textContent.includes('PDF') ? 'PDF' : 'Excel';
+                    alert(`Exportação para ${tipo} solicitada!`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
